@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 
+from uuid import uuid4
+
 from django.conf import settings
 from django.db import models
 
 from .signals import payment_process
 from .signals import payment_completed
-from .utils import get_formatted_uuid
+
+
+def get_default_as_uuid():
+    return str(uuid4()).replace('-', '')
 
 
 class Payment(models.Model):
@@ -68,7 +73,7 @@ class Payment(models.Model):
         u'Номер витрины', default=settings.YANDEX_MONEY_SCID)
     customer_number = models.CharField(
         u'Идентификатор плательщика', max_length=64,
-        default=get_formatted_uuid)
+        default=get_default_as_uuid)
     order_amount = models.DecimalField(
         u'Сумма заказа', max_digits=15, decimal_places=2)
 
@@ -79,7 +84,8 @@ class Payment(models.Model):
         u'Способ платежа', max_length=2, default=PAYMENT_TYPE.PC,
         choices=PAYMENT_TYPE.CHOICES)
     order_number = models.CharField(
-        u'Номер заказа', max_length=64, default=get_formatted_uuid)
+        u'Номер заказа', max_length=64,
+        default=get_default_as_uuid)
     cps_email = models.EmailField(
         u'Email плательщика', max_length=100, blank=True, null=True)
     cps_phone = models.CharField(
